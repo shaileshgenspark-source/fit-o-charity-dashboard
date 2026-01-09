@@ -80,6 +80,7 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 
 // Start server
+console.log('🏁 Starting HTTP server...');
 httpServer.listen(Number(PORT), '0.0.0.0', () => {
   console.log(`
   🌟 FIT-O-CHARITY BACKEND V2 🌟
@@ -89,6 +90,11 @@ httpServer.listen(Number(PORT), '0.0.0.0', () => {
   🛠️  Mode:    ${process.env.NODE_ENV || 'development'}
   ---------------------------------------
   `);
+});
+
+// Handle unhandled rejections
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
 export { app, httpServer };
