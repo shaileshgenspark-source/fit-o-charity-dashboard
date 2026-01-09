@@ -7,33 +7,31 @@ import Leaderboard from './pages/Leaderboard';
 import AdminDashboard from './pages/AdminDashboard';
 import MyPerformance from './pages/MyPerformance';
 import Navbar from './components/Navbar';
+import BottomNav from './components/BottomNav';
 
 function App() {
   return (
     <Router>
-      <div className="min-h-screen relative">
+      <div className="min-h-screen relative bg-[#050505]">
         <div className="mesh-bg fixed inset-0 pointer-events-none" />
         <Toaster 
-          position="top-right"
+          position="top-center"
           toastOptions={{
-            duration: 4000,
+            duration: 3000,
             style: {
-              background: 'rgba(0, 0, 0, 0.8)',
+              background: 'rgba(26, 26, 26, 0.95)',
               color: '#fff',
               backdropFilter: 'blur(10px)',
-              borderRadius: '12px',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-            },
-            success: {
-              iconTheme: {
-                primary: '#22c55e',
-                secondary: '#fff',
-              },
+              borderRadius: '0px',
+              border: '1px solid #FF6B35',
+              fontSize: '12px',
+              fontWeight: 'bold',
+              letterSpacing: '0.1em'
             },
           }}
         />
         <Navbar />
-        <div className="container mx-auto px-4 pb-20">
+        <div className="container mx-auto px-4 pb-24 lg:pb-12">
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/submit" element={<SubmitActivity />} />
@@ -43,6 +41,7 @@ function App() {
             <Route path="/my-performance" element={<MyPerformance />} />
           </Routes>
         </div>
+        <BottomNav />
       </div>
     </Router>
   );

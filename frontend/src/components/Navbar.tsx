@@ -7,7 +7,6 @@ import { settingsApi } from '../services/api';
 const Navbar = () => {
   const location = useLocation();
   const [showLeaderboard, setShowLeaderboard] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
   const isActive = (path: string) => location.pathname === path;
 
   useEffect(() => {
@@ -37,7 +36,7 @@ const Navbar = () => {
     <nav className="sticky top-0 z-50 bg-[#1A1A1A]/80 backdrop-blur-md border-b border-[#3F3F3F]">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-3 group" onClick={() => setIsOpen(false)}>
+          <Link to="/" className="flex items-center gap-3 group">
             <div className="p-2 bg-[#262626] border border-[#3F3F3F] group-hover:border-[#FF6B35] transition-colors">
               <Activity className="text-[#FF6B35]" size={20} />
             </div>
@@ -47,7 +46,7 @@ const Navbar = () => {
             </div>
           </Link>
 
-          {/* Desktop Nav */}
+          {/* Desktop Nav Only */}
           <div className="hidden lg:flex items-center gap-2 sm:gap-6">
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -73,59 +72,8 @@ const Navbar = () => {
               );
             })}
           </div>
-
-          {/* Mobile Toggle */}
-          <div className="lg:hidden flex items-center">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="p-2 text-[#8C8C8C] hover:text-[#FF6B35] transition-colors"
-            >
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
         </div>
       </div>
-
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden bg-[#1A1A1A] border-b border-[#3F3F3F] overflow-hidden"
-          >
-            <div className="flex flex-col p-4 gap-2">
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <Link 
-                    key={item.path} 
-                    to={item.path} 
-                    onClick={() => setIsOpen(false)}
-                    className="w-full"
-                  >
-                    <div
-                      className={`flex items-center gap-4 px-4 py-3 border ${
-                        isActive(item.path)
-                          ? 'border-[#FF6B35] text-[#FF6B35] bg-[#FF6B35]/5'
-                          : item.highlight
-                          ? 'bg-[#FF6B35] text-black border-[#FF6B35]'
-                          : 'border-[#3F3F3F] text-[#8C8C8C]'
-                      }`}
-                    >
-                      <Icon size={20} />
-                      <span className="text-sm font-bold tracking-widest uppercase">
-                        {item.label}
-                      </span>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-[#FF6B35]/30 to-transparent" />
     </nav>
