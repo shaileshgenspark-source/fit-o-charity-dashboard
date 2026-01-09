@@ -1,5 +1,5 @@
 import express from 'express';
-import { sendDailyReminders } from '../jobs/reminderJob.js';
+import ReminderJob from '../jobs/reminderJob.js';
 
 const router = express.Router();
 
@@ -7,7 +7,7 @@ const router = express.Router();
 router.get('/reminders', async (req, res) => {
   try {
     console.log('⏰ Triggering Scheduled Reminders via Vercel Cron...');
-    await sendDailyReminders();
+    await ReminderJob.checkAndSendReminders();
     res.status(200).json({ success: true, message: 'Reminders triggered' });
   } catch (error) {
     console.error('Cron Error:', error);
