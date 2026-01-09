@@ -79,18 +79,16 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-// Only start server if run directly (not imported)
-if (import.meta.url === `file://${process.argv[1]}`) {
-  httpServer.listen(Number(PORT), '0.0.0.0', () => {
-    console.log(`
-    🌟 FIT-O-CHARITY BACKEND V2 🌟
-    ---------------------------------------
-    🚀 Server:  http://localhost:${PORT}
-    📡 Status:  Active
-    🛠️  Mode:    ${process.env.NODE_ENV || 'development'}
-    ---------------------------------------
-    `);
-  });
-}
+// Start server
+httpServer.listen(Number(PORT), '0.0.0.0', () => {
+  console.log(`
+  🌟 FIT-O-CHARITY BACKEND V2 🌟
+  ---------------------------------------
+  🚀 Server:  http://localhost:${PORT}
+  📡 Status:  Active
+  🛠️  Mode:    ${process.env.NODE_ENV || 'development'}
+  ---------------------------------------
+  `);
+});
 
 export { app, httpServer };
