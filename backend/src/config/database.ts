@@ -5,7 +5,7 @@ import Participant from '../models/Participant.js';
 let mongod: any = null;
 
 export const connectDB = async () => {
-  let dbUrl = process.env.MONGODB_URI;
+  let dbUrl = process.env.MONGODB_URI || process.env.MONGO_URL;
 
   const startInMemory = async () => {
     console.log('⚠️  Production DB unreachable. Starting In-Memory Database...');

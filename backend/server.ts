@@ -18,6 +18,7 @@ import vercelCronRoutes from './src/routes/cron.js';
 
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 
 // Define __dirname for ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -25,25 +26,16 @@ const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
-// Connect to Database (with automatic fallback to in-memory)
-connectDB().then(() => {
-  // Start Cron Jobs only if enabled
-  if (process.env.ENABLE_REMINDER_JOB !== 'false') {
-    ReminderJob.start();
-  } else {
-    console.log('⚠️ Reminder job disabled via environment variable');
-  }
-});
-
 const app = express();
 const httpServer = createServer(app);
+const PORT = process.env.PORT || 5000;
 
 // WebSocket
 initWebSocket(httpServer);
 
 // Global Middleware
 app.use(helmet({
-  contentSecurityPolicy: false, // Disable for dev simplicity with external assets
+  contentSecurityPolicy: false,
 }));
 app.use(cors());
 app.use(morgan('dev'));
@@ -60,7 +52,9 @@ app.use('/api/cron', vercelCronRoutes);
 // Static Files - Serve Frontend
 const frontendPath = path.join(__dirname, '../frontend/dist');
 console.log('📂 Frontend Path resolved to:', frontendPath);
-app.use(express.static(frontendPath));
+if (fs.existsSync(frontendPath)) {
+  app.use(express.static(frontendPath));
+}
 
 // Health Check
 app.get('/api/health', (req, res) => {
@@ -70,31 +64,51 @@ app.get('/api/health', (req, res) => {
 // Fallback to index.html for SPA routing
 app.get('*', (req, res, next) => {
   if (req.path.startsWith('/api')) return next();
-  res.sendFile(path.join(frontendPath, 'index.html'));
+  const indexPath = path.join(frontendPath, 'index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.status(404).send('Frontend not built');
+  }
 });
 
 // Error Handling
 app.use(notFound);
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+// Unified Start Function
+const startServer = async () => {
+  try {
+    console.log('🔗 Connecting to Database...');
+    await connectDB();
+    
+    // Start Cron Jobs only if enabled
+    if (process.env.ENABLE_REMINDER_JOB !== 'false') {
+      ReminderJob.start();
+    }
 
-// Start server
-console.log('🏁 Starting HTTP server...');
-httpServer.listen(Number(PORT), '0.0.0.0', () => {
-  console.log(`
-  🌟 FIT-O-CHARITY BACKEND V2 🌟
-  ---------------------------------------
-  🚀 Server:  http://localhost:${PORT}
-  📡 Status:  Active
-  🛠️  Mode:    ${process.env.NODE_ENV || 'development'}
-  ---------------------------------------
-  `);
-});
+    console.log('🏁 Starting HTTP server...');
+    httpServer.listen(Number(PORT), '0.0.0.0', () => {
+      console.log(`
+      🌟 FIT-O-CHARITY BACKEND V2 🌟
+      ---------------------------------------
+      🚀 Server:  http://localhost:${PORT}
+      📡 Status:  Active
+      🛠️  Mode:    ${process.env.NODE_ENV || 'production'}
+      ---------------------------------------
+      `);
+    });
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
+};
 
 // Handle unhandled rejections
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
+
+startServer();
 
 export { app, httpServer };
