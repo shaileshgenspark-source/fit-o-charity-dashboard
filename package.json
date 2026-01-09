@@ -6,6 +6,9 @@
     "postinstall": "cd frontend && npm install && cd ../backend && npm install",
     "build": "cd backend && npm run build && cd ../frontend && npm run build"
   },
+  "dependencies": {
+    "typescript": "^5.9.3"
+  },
   "engines": {
     "node": "24.x"
   }
