@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: sfoc-backend
+    env: node
+    plan: free
+    buildCommand: cd backend && npm install && npm run build
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        sync: false
+      - key: ENABLE_REMINDER_JOB
+        value: true
+      - key: CRON_AUTH_TOKEN
+        sync: false

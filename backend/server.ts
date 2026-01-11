@@ -38,7 +38,10 @@ initWebSocket(httpServer);
 app.use(helmet({
   contentSecurityPolicy: false,
 }));
-app.use(cors());
+app.use(cors({
+  origin: '*', // Allow Cloudflare Pages
+  credentials: true
+}));
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
