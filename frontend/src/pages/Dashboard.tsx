@@ -125,7 +125,7 @@ const Dashboard = () => {
               <Link to="/submit" className="w-full sm:w-auto">
                 <button className="btn-safety w-full flex items-center justify-center gap-3 py-4 sm:py-3 px-8">
                   <Zap size={20} fill="currentColor" />
-                  INITIATE_LOG
+                  SUBMIT_ACTIVITY
                   <ArrowRight size={18} />
                 </button>
               </Link>
