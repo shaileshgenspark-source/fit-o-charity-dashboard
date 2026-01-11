@@ -43,7 +43,7 @@ const MyPerformance = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (code.length !== 6) return toast.error('INVALID_CODE: MUST_BE_6_CHARACTERS');
+    if (!code) return toast.error('INVALID_CODE: REQUIRED');
 
     setLoading(true);
     try {
@@ -110,7 +110,6 @@ const MyPerformance = () => {
                 <label className="tech-label text-white">OPERATIVE_CODE</label>
                 <input 
                   type="text" 
-                  maxLength={6}
                   autoFocus
                   placeholder="ENTER_UID"
                   className="w-full bg-[#050505] border-2 border-[#2D2D2D] p-6 text-white text-center text-4xl font-black tracking-[0.5em] focus:border-[#FF6B35] outline-none transition-all uppercase"

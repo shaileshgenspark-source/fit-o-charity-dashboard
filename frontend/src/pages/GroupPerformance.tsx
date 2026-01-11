@@ -101,7 +101,7 @@ const GroupPerformance = () => {
 
             <form onSubmit={handleLogin} className="space-y-6 text-left">
               <div className="space-y-2">
-                <label className="tech-label text-white">GROUP_CODE (e.g. 1000)</label>
+                <label className="tech-label text-white">GROUP_CODE (e.g. 1000, 2000)</label>
                 <input 
                   type="text" 
                   autoFocus
@@ -110,6 +110,9 @@ const GroupPerformance = () => {
                   value={code}
                   onChange={e => setCode(e.target.value)}
                 />
+                <p className="text-[10px] text-gray-500 font-bold text-center uppercase tracking-widest mt-2">
+                  Enter the base series (e.g. 1000 for users 1000-1999)
+                </p>
               </div>
 
               <button 
