@@ -12,7 +12,9 @@ import {
   MapPin, 
   ArrowLeft,
   LayoutGrid,
-  Zap
+  Zap,
+  ChevronRight,
+  Target
 } from 'lucide-react';
 import { 
   ResponsiveContainer, 
@@ -22,16 +24,13 @@ import {
   YAxis, 
   CartesianGrid, 
   Tooltip, 
-  LineChart, 
-  Line,
-  Cell,
   PieChart,
-  Pie
+  Pie,
+  Cell
 } from 'recharts';
 import { activitiesApi, participantsApi, Participant, Activity } from '../services/api';
 import { format } from 'date-fns';
 
-const BRAND_ORANGE = '#FF6B35';
 const CHART_COLORS = ['#FF6B35', '#FF8C5A', '#CC4E14', '#E0E0E0', '#4A4A4A'];
 
 const MyPerformance = () => {
@@ -43,7 +42,7 @@ const MyPerformance = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!code) return toast.error('INVALID_CODE: REQUIRED');
+    if (!code) return toast.error('OPERATIVE_CODE_REQUIRED');
 
     setLoading(true);
     try {
@@ -56,7 +55,7 @@ const MyPerformance = () => {
       setIsAuthenticated(true);
       toast.success('UPLINK_ESTABLISHED: PROFILE_SYNC_COMPLETE');
     } catch (err: any) {
-      toast.error(err.message || 'SYNC_FAILED: OPERATIVE_NOT_FOUND');
+      toast.error('OPERATIVE_NOT_FOUND_IN_REGISTRY');
     } finally {
       setLoading(false);
     }
@@ -69,11 +68,11 @@ const MyPerformance = () => {
     setCode('');
   };
 
-  // Process data for charts
-  const dailyData = activities.slice(0, 7).reverse().map(a => ({
+  const dailyData = activities.slice(0, 10).reverse().map(a => ({
     date: format(new Date(a.createdAt), 'dd/MM'),
     distance: a.distance || 0,
-    duration: a.duration || 0
+    duration: a.duration || 0,
+    points: a.points || 0
   }));
 
   const typeDistribution = activities.reduce((acc: any[], curr) => {
@@ -92,27 +91,27 @@ const MyPerformance = () => {
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="industrial-panel p-12 max-w-md w-full border-l-4 border-l-[#FF6B35]"
+          className="industrial-panel p-8 md:p-12 max-w-md w-full border-l-4 border-l-[#FF6B35]"
         >
           <div className="text-center space-y-6">
             <div className="flex justify-center">
-              <div className="p-4 bg-[#FF6B35]/10 border border-[#FF6B35]/30 rounded-full">
+              <div className="p-4 bg-[#FF6B35]/10 border border-[#FF6B35]/30 rounded-full shadow-[0_0_20px_rgba(255,107,53,0.2)]">
                 <User size={48} className="text-[#FF6B35]" />
               </div>
             </div>
             <div>
-              <div className="tech-label text-[#FF6B35]">UPLINK_PORTAL: OPERATIVE_SYNC</div>
-              <h2 className="text-3xl font-black tracking-tighter text-white uppercase italic">MY_PERFORMANCE</h2>
+              <div className="tech-label text-[#FF6B35] mb-1">UPLINK_PORTAL: PERSONAL_METRICS</div>
+              <h2 className="text-3xl md:text-4xl font-black tracking-tighter text-white uppercase italic">MY_PERFORMANCE</h2>
             </div>
 
             <form onSubmit={handleLogin} className="space-y-6 text-left">
               <div className="space-y-2">
-                <label className="tech-label text-white">OPERATIVE_CODE</label>
+                <label className="tech-label text-white">OPERATIVE_UID</label>
                 <input 
                   type="text" 
                   autoFocus
-                  placeholder="ENTER_UID"
-                  className="w-full bg-[#050505] border-2 border-[#2D2D2D] p-6 text-white text-center text-4xl font-black tracking-[0.5em] focus:border-[#FF6B35] outline-none transition-all uppercase"
+                  placeholder="ENTER_CODE"
+                  className="w-full bg-[#050505] border-2 border-[#2D2D2D] p-5 md:p-6 text-white text-center text-3xl md:text-4xl font-black tracking-[0.3em] focus:border-[#FF6B35] outline-none transition-all uppercase placeholder:text-[#1A1A1A]"
                   value={code}
                   onChange={e => setCode(e.target.value)}
                 />
@@ -121,9 +120,9 @@ const MyPerformance = () => {
               <button 
                 type="submit" 
                 disabled={loading}
-                className="btn-safety w-full py-5 flex items-center justify-center gap-4 text-xl"
+                className="btn-safety w-full py-5 flex items-center justify-center gap-4 text-xl shadow-[8px_8px_0px_0px_#000]"
               >
-                {loading ? 'SYNCING...' : 'ESTABLISH_CONNECTION'}
+                {loading ? 'SYNCING...' : 'ESTABLISH_UPLINK'}
                 {!loading && <Search size={24} />}
               </button>
             </form>
@@ -134,119 +133,122 @@ const MyPerformance = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto py-12 space-y-12">
-      {/* Header */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between border-b-2 border-[#FF6B35] pb-6 gap-4">
-        <div>
+    <div className="space-y-8 py-6 md:py-12">
+      {/* Mobile-Friendly Header */}
+      <header className="flex flex-col md:flex-row md:items-end justify-between border-b-2 border-[#FF6B35] pb-6 gap-4 px-2">
+        <div className="space-y-1">
           <div className="tech-label text-[#FF6B35]">OPERATIVE_PROFILE: {participant?.individualCode}</div>
-          <h1 className="text-5xl font-black tracking-tighter text-white uppercase">{participant?.name}</h1>
+          <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-white uppercase truncate">
+            {participant?.name}
+          </h1>
         </div>
         <button 
           onClick={logout}
-          className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-white transition-colors"
+          className="flex items-center justify-center gap-2 px-4 py-2 border border-[#3F3F3F] text-[10px] font-black text-[#8C8C8C] hover:text-white hover:border-[#FF6B35] transition-all uppercase tracking-widest bg-[#1A1A1A]/50"
         >
           <ArrowLeft size={14} />
           TERMINATE_SESSION
         </button>
       </header>
 
-      {/* Summary Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Stats Grid - 2 Column on Mobile */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         {[
-          { label: 'TOTAL_POINTS', val: `${(participant?.totalPoints || 0).toLocaleString()} PTS`, icon: Zap, highlight: true },
-          { label: 'TOTAL_DISTANCE', val: `${participant?.totalDistance.toFixed(1)} KM`, icon: TrendingUp },
-          { label: 'TOTAL_DURATION', val: `${participant?.totalDuration} MIN`, icon: Clock },
-          { label: 'CURRENT_STREAK', val: `${participant?.streakDays} DAYS`, icon: Flame },
+          { label: 'POINTS', val: `${(participant?.totalPoints || 0).toLocaleString()}`, icon: Zap, highlight: true },
+          { label: 'STREAK', val: `${participant?.streakDays} DAYS`, icon: Flame },
+          { label: 'DISTANCE', val: `${participant?.totalDistance.toFixed(1)} KM`, icon: TrendingUp },
+          { label: 'DURATION', val: `${participant?.totalDuration} MIN`, icon: Clock },
         ].map((stat, i) => (
           <motion.div 
             key={i}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className={`industrial-panel p-6 border-l-4 ${stat.highlight ? 'border-l-[#FF6B35] bg-[#FF6B35]/5' : 'border-l-gray-800'}`}
+            className={`industrial-panel p-4 md:p-6 border-l-2 md:border-l-4 ${stat.highlight ? 'border-l-[#FF6B35] bg-[#FF6B35]/5' : 'border-l-[#3F3F3F]'}`}
           >
-            <div className="flex justify-between items-start mb-4">
-              <div className="tech-label">{stat.label}</div>
-              <stat.icon size={18} className={stat.highlight ? 'text-[#FF6B35]' : 'text-gray-600'} />
+            <div className="flex justify-between items-start mb-2 md:mb-4">
+              <div className="tech-label text-[8px] md:text-[10px]">{stat.label}</div>
+              <stat.icon size={16} className={stat.highlight ? 'text-[#FF6B35]' : 'text-[#4A4A4A]'} />
             </div>
-            <div className="text-3xl font-black text-white tracking-tighter">{stat.val}</div>
+            <div className="text-xl md:text-3xl font-black text-white tracking-tighter truncate">{stat.val}</div>
           </motion.div>
         ))}
       </div>
 
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Progress Trend */}
-        <div className="lg:col-span-8 industrial-panel p-8">
-          <div className="tech-label text-[#FF6B35] mb-8">PERFORMANCE_HISTORY: RECENT_CYCLES</div>
-          <div className="h-[350px] w-full">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
+        {/* Performance Trend Chart */}
+        <div className="lg:col-span-8 industrial-panel p-4 md:p-8">
+          <div className="flex items-center gap-3 mb-6 md:mb-8">
+            <TrendingUp size={18} className="text-[#FF6B35]" />
+            <div className="tech-label text-[#FF6B35]">ACTIVITY_DYNAMICS: LAST_10_CYCLES</div>
+          </div>
+          <div className="h-[250px] md:h-[350px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={dailyData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1A1A1A" vertical={false} />
-                <XAxis dataKey="date" stroke="#444" fontSize={10} tickLine={false} axisLine={false} />
-                <YAxis stroke="#444" fontSize={10} tickLine={false} axisLine={false} />
+                <XAxis dataKey="date" stroke="#444" fontSize={9} tickLine={false} axisLine={false} />
+                <YAxis stroke="#444" fontSize={9} tickLine={false} axisLine={false} />
                 <Tooltip 
                   cursor={{ fill: 'rgba(255, 107, 53, 0.05)' }}
                   contentStyle={{ backgroundColor: '#0D0D0D', border: '1px solid #FF6B3533', borderRadius: '0px' }}
-                  itemStyle={{ color: '#FF6B35', fontSize: '12px', fontWeight: 'bold' }}
+                  itemStyle={{ color: '#FF6B35', fontSize: '11px', fontWeight: 'bold' }}
                 />
-                <Bar 
-                  dataKey="distance" 
-                  fill="#FF6B35" 
-                  name="DISTANCE_KM" 
-                  animationDuration={2000}
-                />
+                <Bar dataKey="distance" fill="#FF6B35" name="KM" radius={[2, 2, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Modality Split */}
-        <div className="lg:col-span-4 industrial-panel p-8">
-          <div className="tech-label text-[#FF6B35] mb-8">MODALITY_DYNAMICS</div>
-          <div className="h-[350px] w-full">
+        {/* Modality Pie Chart */}
+        <div className="lg:col-span-4 industrial-panel p-6 md:p-8 flex flex-col items-center">
+          <div className="w-full flex items-center gap-3 mb-6">
+            <Target size={18} className="text-[#FF6B35]" />
+            <div className="tech-label text-[#FF6B35]">MODALITY_MIX</div>
+          </div>
+          <div className="h-[200px] md:h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={typeDistribution}
-                  innerRadius={70}
-                  outerRadius={100}
+                  innerRadius="60%"
+                  outerRadius="85%"
                   paddingAngle={5}
                   dataKey="value"
                   stroke="none"
                 >
-                  {typeDistribution.map((entry, index) => (
+                  {typeDistribution.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                   ))}
                 </Pie>
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#0D0D0D', border: '1px solid #FF6B3533', borderRadius: '0px' }}
-                  itemStyle={{ fontSize: '10px', fontWeight: 'bold' }}
+                  contentStyle={{ backgroundColor: '#0D0D0D', border: '1px solid #FF6B3533', borderRadius: '0px', fontSize: '10px' }}
                 />
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <div className="mt-4 grid grid-cols-2 gap-2">
+          <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 w-full">
             {typeDistribution.map((item, i) => (
               <div key={i} className="flex items-center gap-2">
-                <div className="w-2 h-2" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }} />
-                <span className="text-[10px] font-bold text-gray-500 uppercase">{item.name}</span>
+                <div className="w-2 h-2 flex-shrink-0" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }} />
+                <span className="text-[9px] font-black text-gray-500 uppercase truncate">{item.name}</span>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Activity Log Table */}
-      <div className="industrial-panel overflow-hidden border-l-4 border-l-[#FF6B35]">
+      {/* Activity Log - Better for Mobile */}
+      <div className="industrial-panel border-l-2 md:border-l-4 border-l-[#FF6B35] overflow-hidden">
         <div className="p-4 bg-[#1A1A1A] border-b border-[#2D2D2D] flex justify-between items-center">
           <div className="flex items-center gap-3">
             <LayoutGrid className="text-[#FF6B35]" size={18} />
-            <h3 className="text-sm font-bold tracking-widest uppercase">TRANSACTION_LOG</h3>
+            <h3 className="text-xs font-black tracking-widest uppercase">TRANSACTION_LOG</h3>
           </div>
-          <span className="text-[10px] font-bold text-gray-600">TOTAL_RECORDS: {activities.length}</span>
+          <span className="text-[10px] font-bold text-gray-600">RECORDS: {activities.length}</span>
         </div>
-        <div className="overflow-x-auto">
+        
+        {/* Card-style log for mobile, table for desktop */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-[#2D2D2D] text-[10px] font-black text-gray-500 uppercase tracking-widest">
@@ -268,18 +270,41 @@ const MyPerformance = () => {
                     </span>
                   </td>
                   <td className="p-4 text-xs font-bold text-gray-400">
-                    {a.distance}KM | {a.duration}MIN
+                    {a.distance > 0 ? `${a.distance}KM` : `${a.duration}MIN`} | {a.points} PTS
                   </td>
                   <td className="p-4">
-                    <div className="flex items-center gap-2 text-[10px] font-black text-[#2ECC71]">
+                    <div className="flex items-center gap-2 text-[9px] font-black text-[#2ECC71]">
                       <div className="w-1.5 h-1.5 bg-[#2ECC71] rounded-full animate-pulse" />
-                      VERIFIED
+                      SYNC_VERIFIED
                     </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Log View */}
+        <div className="md:hidden divide-y divide-[#1A1A1A]">
+          {activities.map((a, i) => (
+            <div key={i} className="p-4 flex items-center justify-between">
+              <div className="space-y-1">
+                <div className="text-[10px] font-black text-white flex items-center gap-2">
+                  <ActivityIcon size={12} className="text-[#FF6B35]" />
+                  {a.activityType.toUpperCase()}
+                </div>
+                <div className="text-[9px] font-bold text-[#4A4A4A] tracking-tighter uppercase">
+                  {format(new Date(a.createdAt), 'MMM dd | HH:mm')}
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-sm font-black text-[#FF6B35]">
+                  {a.distance > 0 ? `${a.distance}KM` : `${a.duration}MIN`}
+                </div>
+                <div className="text-[8px] font-black text-[#2ECC71] uppercase">+{a.points} PTS</div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
