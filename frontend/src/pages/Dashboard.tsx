@@ -114,7 +114,7 @@ const Dashboard = () => {
 
             <h1 className="text-4xl sm:text-5xl md:text-8xl font-black tracking-tighter leading-[0.9] text-white break-words">
               FIT-O-CHARITY <br />
-              <span className="text-[#FF6B35]">BY_SUKRUT_PARIVAR</span>
+              <span className="text-[#FF6B35]">BY_SUKRUT_PARIVAAR</span>
             </h1>
 
             <p className="text-base md:text-lg text-[#8C8C8C] max-w-xl font-medium leading-relaxed">

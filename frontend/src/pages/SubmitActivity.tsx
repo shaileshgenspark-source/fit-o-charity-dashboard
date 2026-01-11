@@ -6,7 +6,6 @@ import {
   Hash, 
   MapPin, 
   Clock, 
-  Users, 
   ShieldCheck,
   Zap,
   Flame,
@@ -15,7 +14,6 @@ import {
   Timer,
   Dumbbell,
   ChevronDown,
-  ArrowRight
 } from 'lucide-react';
 import Confetti, { smallBurst } from '../components/Confetti';
 import { activitiesApi, ActivitySubmission } from '../services/api';
@@ -158,6 +156,7 @@ const SubmitActivity = () => {
             onSubmit={handleSubmit}
             className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8"
           >
+            {/* Primary Inputs */}
             <div className="lg:col-span-7 space-y-6 md:space-y-8">
               <div className="industrial-panel p-6 md:p-8 space-y-4 md:space-y-6 border-l-4 border-l-[#FF6B35]">
                 <div className="flex items-center gap-3">
@@ -213,9 +212,11 @@ const SubmitActivity = () => {
               </div>
             </div>
 
+            {/* Secondary/Optional Inputs */}
             <div className="lg:col-span-5 space-y-6 md:space-y-8">
               <div className="industrial-panel p-6 md:p-8 space-y-4 md:space-y-6 bg-[#1A1A1A]/50">
-                <div className="grid grid-cols-2 gap-4">
+                
+                {(formData.activityType === 'Walking' || formData.activityType === 'Running' || formData.activityType === 'Cycling') && (
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
                       <MapPin size={16} className="text-[#FF6B35]" />
@@ -232,6 +233,9 @@ const SubmitActivity = () => {
                       className="w-full bg-[#0D0D0D] border-2 border-[#2D2D2D] p-3 text-white text-xl font-black focus:border-[#FF6B35] outline-none"
                     />
                   </div>
+                )}
+
+                {(formData.activityType === 'Yoga' || formData.activityType === 'Gym') && (
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
                       <Clock size={16} className="text-[#FF6B35]" />
@@ -247,23 +251,14 @@ const SubmitActivity = () => {
                       className="w-full bg-[#0D0D0D] border-2 border-[#2D2D2D] p-3 text-white text-xl font-black focus:border-[#FF6B35] outline-none"
                     />
                   </div>
-                </div>
-              </div>
+                )}
 
-              <div className="industrial-panel p-6 md:p-8 space-y-4 md:space-y-6">
-                <div className="flex items-center gap-2">
-                  <Users size={16} className="text-[#FF6B35]" />
-                  <label className="tech-label text-white">GROUP_ID (OPTIONAL)</label>
-                </div>
-                <input
-                  type="text"
-                  name="groupCode"
-                  value={formData.groupCode}
-                  onChange={handleChange}
-                  placeholder="UNIT_CODE"
-                  maxLength={6}
-                  className="w-full bg-[#0D0D0D] border-2 border-[#2D2D2D] p-3 md:p-4 text-white text-lg font-black uppercase tracking-widest focus:border-[#FF6B35] outline-none"
-                />
+                {!formData.activityType && (
+                  <div className="p-4 border border-[#2D2D2D] text-center text-gray-500 text-xs font-bold uppercase tracking-widest">
+                    Select Activity Type to Enter Metrics
+                  </div>
+                )}
+
               </div>
 
               <button
