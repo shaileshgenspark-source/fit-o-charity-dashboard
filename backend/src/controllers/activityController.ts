@@ -7,7 +7,8 @@ export const submitActivity = async (req: Request, res: Response, next: NextFunc
     const result = validateActivity(req.body);
     
     if (!result.success) {
-      return res.status(400).json({ error: (result.error as any).errors[0].message });
+      const errorMessage = result.error.issues?.[0]?.message || 'Invalid input data';
+      return res.status(400).json({ error: errorMessage });
     }
 
     const submissionData = {
