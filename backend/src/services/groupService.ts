@@ -2,6 +2,7 @@ import Group, { IGroup } from '../models/Group.js';
 import Participant from '../models/Participant.js';
 import Activity from '../models/Activity.js';
 import { generateCode } from '../utils/codeGenerator.js';
+import { determineGroupCode } from '../utils/validation.js';
 
 export class GroupService {
   static async create(data: {
@@ -66,7 +67,9 @@ export class GroupService {
   }
 
   static async getLeaderboard(groupCode: string) {
-    const participants = await Participant.find({ groupCode: groupCode.toUpperCase() })
+    const targetCode = determineGroupCode(groupCode) || groupCode.toUpperCase();
+    
+    const participants = await Participant.find({ groupCode: targetCode })
       .sort({ totalPoints: -1 })
       .select('name individualCode totalDistance totalDuration totalPoints streakDays');
 
@@ -76,7 +79,7 @@ export class GroupService {
     const totalPoints = participants.reduce((acc, curr) => acc + curr.totalPoints, 0);
 
     return {
-      groupCode,
+      groupCode: targetCode,
       totalMembers: participants.length,
       totalDistance: Math.round(totalDistance * 10) / 10,
       totalDuration: Math.round(totalDuration),
@@ -87,7 +90,8 @@ export class GroupService {
 
   // New method to fetch activities for the entire group
   static async getGroupActivities(groupCode: string) {
-    return Activity.find({ groupCode: groupCode.toUpperCase() })
+    const targetCode = determineGroupCode(groupCode) || groupCode.toUpperCase();
+    return Activity.find({ groupCode: targetCode })
       .sort({ createdAt: -1 })
       .limit(50); // Limit to last 50 for performance
   }

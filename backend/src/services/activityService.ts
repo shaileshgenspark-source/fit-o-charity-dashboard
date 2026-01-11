@@ -1,6 +1,7 @@
 import Activity, { IActivity } from '../models/Activity.js';
 import Participant from '../models/Participant.js';
 import { broadcastActivity } from '../websocket/socketHandler.js';
+import { determineGroupCode } from '../utils/validation.js';
 
 const calculatePoints = (type: string, distance: number, duration: number): number => {
   const activityType = type.toLowerCase();
@@ -21,19 +22,6 @@ const calculatePoints = (type: string, distance: number, duration: number): numb
   }
 
   return Math.round(points * 100) / 100; // Keep 2 decimal places
-};
-
-const determineGroupCode = (code: string): string | null => {
-  const codeNum = parseInt(code);
-  if (!isNaN(codeNum)) {
-    if (codeNum >= 1000 && codeNum < 2000) return '1000';
-    if (codeNum >= 2000 && codeNum < 3000) return '2000';
-    if (codeNum >= 3000 && codeNum < 4000) return '3000';
-    if (codeNum >= 4000 && codeNum < 5000) return '4000';
-    if (codeNum >= 5000 && codeNum < 6000) return '5000';
-    // Add more ranges if needed
-  }
-  return null;
 };
 
 export class ActivityService {
