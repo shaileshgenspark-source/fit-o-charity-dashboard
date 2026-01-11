@@ -26,7 +26,7 @@ const Navbar = () => {
 
   const navItems = [
     { path: '/', icon: LayoutGrid, label: 'DASHBOARD' },
-    { path: '/submit', icon: Plus, label: 'LOG ACTIVITY', highlight: true },
+    { path: '/submit', icon: Plus, label: 'SUBMIT ACTIVITY', highlight: true },
     { path: '/my-performance', icon: User, label: 'MY PERFORMANCE' },
     ...(showLeaderboard ? [{ path: '/leaderboard', icon: Trophy, label: 'LEADERBOARD' }] : []),
     { path: '/admin', icon: ShieldAlert, label: 'ADMIN' },
@@ -42,7 +42,7 @@ const Navbar = () => {
             </div>
             <div className="flex flex-col">
               <span className="text-sm sm:text-lg font-bold tracking-tighter leading-none text-[#FF6B35]">FIT-O-CHARITY</span>
-              <span className="text-[8px] sm:text-[10px] text-[#8C8C8C] font-bold tracking-[0.1em]">SUKRUT PARIVAR TRUST</span>
+              <span className="text-[8px] sm:text-[10px] text-[#8C8C8C] font-bold tracking-[0.1em]">SUKRUT PARIVAAR CHARITABLE TRUST</span>
             </div>
           </Link>
 

@@ -170,6 +170,14 @@ const AdminDashboard = () => {
         >
           BULK_IMPORT_CSV
         </button>
+        <a 
+          href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/export`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="px-8 py-3 font-bold tracking-widest text-xs transition-all bg-[#1A1A1A] text-[#2ECC71] border border-[#2ECC71]/50 hover:bg-[#2ECC71] hover:text-black flex items-center gap-2"
+        >
+          EXPORT_ALL_DATA
+        </a>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">

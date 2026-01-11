@@ -55,3 +55,15 @@ export const getParticipantActivities = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to fetch activities' });
   }
 };
+
+export const exportAllData = async (req: Request, res: Response) => {
+  try {
+    const csvData = await ActivityService.getAllDataForExport();
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=sfoc_data_export.csv');
+    res.status(200).send(csvData);
+  } catch (err) {
+    console.error('Export Error:', err);
+    res.status(500).json({ error: 'Failed to export data' });
+  }
+};

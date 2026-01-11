@@ -23,6 +23,19 @@ const calculatePoints = (type: string, distance: number, duration: number): numb
   return Math.round(points * 100) / 100; // Keep 2 decimal places
 };
 
+const determineGroupCode = (code: string): string | null => {
+  const codeNum = parseInt(code);
+  if (!isNaN(codeNum)) {
+    if (codeNum >= 1000 && codeNum < 2000) return '1000';
+    if (codeNum >= 2000 && codeNum < 3000) return '2000';
+    if (codeNum >= 3000 && codeNum < 4000) return '3000';
+    if (codeNum >= 4000 && codeNum < 5000) return '4000';
+    if (codeNum >= 5000 && codeNum < 6000) return '5000';
+    // Add more ranges if needed
+  }
+  return null;
+};
+
 export class ActivityService {
   static async submit(data: {
     code: string;
@@ -35,7 +48,7 @@ export class ActivityService {
       console.error('[ERROR] ActivityService.submit called with undefined data');
       throw new Error('Internal Server Error: Missing activity data.');
     }
-    const { code, activityType, distance = 0, duration = 0, groupCode } = data;
+    const { code, activityType, distance = 0, duration = 0 } = data; // Ignore incoming groupCode
 
     // 1. Find Participant
     const participant = await Participant.findOne({ individualCode: code.toUpperCase() });
@@ -46,7 +59,10 @@ export class ActivityService {
     // 2. Calculate Points
     const points = calculatePoints(activityType, distance, duration);
 
-    // 3. Create Activity
+    // 3. Determine Group Code Automatically
+    const derivedGroupCode = determineGroupCode(code);
+
+    // 4. Create Activity
     const activity = await Activity.create({
       participantCode: code.toUpperCase(),
       participantName: participant.name,
@@ -54,11 +70,11 @@ export class ActivityService {
       distance,
       duration,
       points,
-      groupCode: groupCode?.toUpperCase() || participant.groupCode,
+      groupCode: derivedGroupCode || participant.groupCode, // Prioritize derived, then existing
       date: new Date()
     });
 
-    // 4. Update Streak & Stats
+    // 5. Update Streak & Stats
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -91,9 +107,12 @@ export class ActivityService {
     participant.totalPoints += points;
     participant.streakDays = newStreak;
     participant.lastActivityDate = new Date();
+    if (derivedGroupCode) {
+        participant.groupCode = derivedGroupCode; // Update participant's group if derived
+    }
     await participant.save();
 
-    // 5. Real-time broadcast
+    // 6. Real-time broadcast
     broadcastActivity(activity);
 
     return {
@@ -144,5 +163,34 @@ export class ActivityService {
 
   static async getByParticipant(code: string) {
     return Activity.find({ participantCode: code.toUpperCase() }).sort({ createdAt: -1 });
+  }
+
+  static async getAllDataForExport() {
+    const activities = await Activity.find().sort({ createdAt: -1 }).lean();
+    
+    // CSV Header
+    let csv = 'Date,Time,Participant Code,Name,Activity Type,Distance (KM),Duration (Min),Points,Group Code\n';
+
+    activities.forEach((act: any) => {
+      const date = new Date(act.createdAt);
+      const dateStr = date.toLocaleDateString();
+      const timeStr = date.toLocaleTimeString();
+      
+      const line = [
+        dateStr,
+        timeStr,
+        act.participantCode,
+        `"${act.participantName}"`, // Quote name to handle commas
+        act.activityType,
+        act.distance || 0,
+        act.duration || 0,
+        act.points || 0,
+        act.groupCode || 'N/A'
+      ].join(',');
+      
+      csv += line + '\n';
+    });
+
+    return csv;
   }
 }
